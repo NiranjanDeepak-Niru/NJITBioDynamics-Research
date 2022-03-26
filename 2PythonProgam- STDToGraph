@@ -9,12 +9,12 @@ from matplotlib.pyplot import figure
 from matplotlib.font_manager import FontProperties
 from numpy import random
 #Iterating through Folder
-rootdir = r"C:\Users\Niranjan School\Downloads\Case 3 Negative Torque"
+rootdir = r"C:\Users\Niranjan School\Documents\NJIT Research\Case 2"
 FileDirBank = ["","","","","","","",""]
 bank = os.listdir(rootdir)
 
 for file in bank:
-    rootdir= rootdir+ "\\"
+    rootdir = rootdir + "\\"
     ankle = False
     hip = False
     knee = False
@@ -23,39 +23,41 @@ for file in bank:
     hip = False
     knee = False
     type = False
-    print(file)
+    type1 = False
+    All = False
     parts = file.split('_')
     for x in parts:
         if x.find("ankle") != -1:
             ankle = True
-        elif x.find("knee") != -1:
+        if x.find("knee") != -1:
             knee = True
-        elif x.find("hip") != -1:
+        if x.find("hip") != -1:
             hip = True
-        elif x.find("JRF") != -1:
+        if x.find("all") != -1:
+            All = True
+        if (x.find("fullcycle") != -1) or (x.find("fullcycle") !=-1):
+            type1 = True
+        if (x.find("solution.sto") != -1) or (x.find("solution.sto") !=-1):
             type=True
-        if type & hip & knee & ankle:
+        type1 = True
+        if ( ( hip) & ( knee) & ( ankle) & type & type1):
             FileDirBank[0]= rootdir + file
-        elif type & (not hip) & (not knee) & (not ankle):
+        elif (type & (not hip) & (not knee) & (not ankle) & type1):
             FileDirBank[1] = rootdir + file
-        elif type & hip & (not knee) & (not ankle):
+        elif (type & hip & (not knee) & (not ankle) & type1):
             FileDirBank[2] = rootdir + file
-        elif type & (not hip) &  knee & (not ankle):
+        elif (type & (not hip) & knee & (not ankle) & type1):
             FileDirBank[3] = rootdir + file
-        elif type & (not hip) & (not knee) & ankle:
+        elif (type & (not hip) & (not knee) & ankle & type1):
             FileDirBank[4] = rootdir + file
-        elif type & hip & knee & (not ankle):
+        elif (type & (hip) & (not knee) & (ankle) & type1):
             FileDirBank[5] = rootdir + file
-        elif type & hip & (not knee) & ankle:
+        elif (type & (hip) & (knee) & (not ankle) & type1):
             FileDirBank[6] = rootdir + file
-        elif type & (not hip) & knee & ankle:
+        elif (type & (not hip) & (knee) & (ankle) & type1):
             FileDirBank[7] = rootdir + file
 
-
-
-
-
-
+print(FileDirBank)
 
 #Variable(Do Not Alter)
 previousnum = sys.float_info.min
@@ -96,7 +98,7 @@ def footdown(next, x):
     elif ((next-previousnum)/(xvals[x]-xvals[previousx]))>0:
         previousnum = next
         previousx= x
-        if (next>threshold) & (next <threshold+5):
+        if ((next>threshold) & (next <threshold+5)):
             start = x
             maxrange[1] = xvals[start]
     else:
@@ -187,10 +189,9 @@ title = "Comparison overtime of GRF, vy"
 XLabel = "Gait Percentage (%)"
 YLabel = "GRF"
 # Enter Size of Header in Number of Lines
-HeaderSize = 5
+HeaderSize =22
 # Enter Names of Lines Plotted Below
 name = ["All","NoExo", "Hip", "Knee", "Ankle", "HipKnee", "HipAnkle", "KneeAnkle"]
-print(FileDirBank[0])
 #Calculating Number of Graphing Iterations
 file1 = open(FileDirBank[0], "r")
 bob = file1.readlines()
@@ -200,12 +201,10 @@ it = len(num)
 #Setting/Reading Data Storage Files
     #When graphing GRF Data, you need to change 'r' to 'r+'
     #When your not graphing GRF Data, you need to change 'r+' to 'r'
-shiftfile = open(r"C:\Users\Niranjan School\Downloads\Case 3 Negative Torque\shift.txt", 'r')
-footupfile = open(r"C:\Users\Niranjan School\Downloads\Case 3 Negative Torque\footup.txt", 'r')
+shiftfile = open(r"C:\Users\Niranjan School\Documents\NJIT Research\Case 2\shift.txt", 'r')
+footupfile = open(r"C:\Users\Niranjan School\Documents\NJIT Research\Case 2\footup.txt", 'r')
 whenupbackup=footupfile.readlines()
 tempshiftdata = shiftfile.readlines()
-
-
 for col in range(it):
     #Setting Graph Title/Variable to be graphed
     file = open(FileDirBank[0], "r")
@@ -215,6 +214,8 @@ for col in range(it):
     YLabel = contenttemp[col].replace("/", "_")
     YLabel = YLabel.replace("|", "_")
     YLabel = YLabel.replace(":", "_")
+    if YLabel.find("_glut_max_l_activation")!=-1:
+        YLabel = "Gluteus Maximus Activation"
     #YLabel = Dict[YLabel]
     title = YLabel
 
@@ -272,6 +273,7 @@ for col in range(it):
                 footdown(round(float(temp[columntrue])), GRFcounter)
                 GRFcounter = GRFcounter+1
             elif counter > HeaderSize-1 & columntrue != -1: # All Data Modification
+                print(x)
                 change = ((float(temp[0]))/(float(xvalmax))) * 100
                 # Changing Time to GAIT CYCLE
                 xvals.append(change)
@@ -288,7 +290,9 @@ for col in range(it):
                 # Figure out if Shift is necessary
                 if maxrange[1] > 1:
                     #Shift Needed
+                    print(yvals)
                     yvals = shift(maxrange[1], maxrange[2])
+                    print(yvals)
                     #Writing Down Shift Data into file
                     whatdata[x] = True
                     constmaxrange[x]=[maxrange[1], maxrange[2]]
@@ -336,4 +340,3 @@ for col in range(it):
     plt.close()
 shiftfile.close()
 footupfile.close()
-
